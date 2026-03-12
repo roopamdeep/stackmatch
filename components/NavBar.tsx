@@ -7,6 +7,7 @@ export default function Navbar() {
       <Link href="/dashboard">Dashboard</Link>
       <Link href="/signup">Signup</Link>
       <Link href="/login">Login</Link>
+      <Link href="/company/post-job">Post Job</Link>
     </nav>
   );
 }
