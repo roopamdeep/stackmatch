@@ -4,7 +4,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
         <h1 className="text-3xl font-bold text-center">Create Account</h1>
         <p className="text-gray-600 text-center mt-2">
-          Join StackMatch as a developer or recruiter
+          Connect deevelopers and companies based on real tech stacks.
         </p>
 
         <form className="mt-8 flex flex-col gap-4">
@@ -28,7 +28,7 @@ export default function SignupPage() {
 
           <select className="border rounded-lg p-3">
             <option>Developer</option>
-            <option>Recruiter</option>
+            <option>Company</option>
           </select>
 
           <button className="bg-black text-white rounded-lg p-3">
