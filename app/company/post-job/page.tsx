@@ -40,7 +40,7 @@ export default function PostJobPage() {
 
           <textarea
             placeholder="Job Description"
-            className="border rounded-lg p-3 min-h-[160px]"
+            className="border rounded-lg p-3 min-h-36"
           />
 
           <button className="bg-black text-white rounded-lg p-3">
