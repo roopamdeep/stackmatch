@@ -24,9 +24,27 @@ export async function POST(request: NextRequest) {
       email,
       password: hashedPassword,
 
-      role,
+      role: role as "DEVELOPER" | "COMPANY",
     },
   });
+  if (role === "DEVELOPER") {
+    await prisma.developer.create({
+      data: {
+        name,
+        userId: user.id,
+        skills: [],
+      },
+    });
+  }
+
+  if (role === "COMPANY") {
+    await prisma.company.create({
+      data: {
+        name,
+        userId: user.id,
+      },
+    });
+  }
   const token = createToken(user.id, user.role);
   const response = NextResponse.json(
     { message: "User created successfully", token },
