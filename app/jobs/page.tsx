@@ -1,6 +1,36 @@
+"use client";
+import { useState, useEffect } from "react";
 import JobCard from "../../components/JobCard";
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [location, setLocation] = useState("");
+  const [stack, setStack] = useState("");
+
+  useEffect(() => {
+    async function fetchJobs() {
+      const res = await fetch("/api/jobs");
+      const data = await res.json();
+      setJobs(data.jobs);
+      setLoading(false);
+    }
+    fetchJobs();
+  }, []);
+
+  const filtered = jobs.filter((job: any) => {
+    return (
+      job.title.toLowerCase().includes(search.toLowerCase()) &&
+      (location === "" ||
+        job.location.toLowerCase().includes(location.toLowerCase())) &&
+      (stack === "" ||
+        job.stack.some((s: string) =>
+          s.toLowerCase().includes(stack.toLowerCase()),
+        ))
+    );
+  });
+
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
@@ -15,29 +45,34 @@ export default function JobsPage() {
               type="text"
               placeholder="Search jobs..."
               className="border rounded-lg p-3"
+              onChange={(e) => setSearch(e.target.value)}
             />
-
-            <select className="border rounded-lg p-3">
-              <option>All Locations</option>
-              <option>Remote</option>
-              <option>Toronto</option>
-              <option>Vancouver</option>
-            </select>
-
-            <select className="border rounded-lg p-3">
-              <option>All Stacks</option>
-              <option>React</option>
-              <option>Node.js</option>
-              <option>Next.js</option>
-            </select>
+            <input
+              type="text"
+              placeholder="Location..."
+              className="border rounded-lg p-3"
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Tech stack..."
+              className="border rounded-lg p-3"
+              onChange={(e) => setStack(e.target.value)}
+            />
           </div>
         </div>
 
-        <div className="grid gap-6 mt-8">
-          <JobCard />
-          <JobCard />
-          <JobCard />
-        </div>
+        {loading ? (
+          <p className="text-center mt-8 text.gray-600">Loading jobs...</p>
+        ) : (
+          <div className="grid gap-6 mt-8">
+            {filtered.length === 0 ? (
+              <p className="text-center text-gray-600">No jobs found</p>
+            ) : (
+              filtered.map((job: any) => <JobCard key={job.id} job={job} />)
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
