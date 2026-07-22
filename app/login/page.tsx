@@ -18,7 +18,7 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } else {
       const data = await res.json();
       setError(data.error);
