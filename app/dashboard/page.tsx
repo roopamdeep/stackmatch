@@ -35,7 +35,7 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Welcome back, {user?.name}!</p>
+        <p className="text-gray-600 mt-2">Welcome, {user?.name}!</p>
 
         <div className="grid md:grid-cols-3 gap-6 mt-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm">

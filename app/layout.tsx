@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/NavBar";
 import Footer from "../components/Footer";
-
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -19,17 +20,28 @@ export const metadata: Metadata = {
   description: "Match developers and companies based on real tech stacks",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  let isLoggedIn = false;
+  if (token) {
+    try {
+      verifyToken(token);
+      isLoggedIn = true;
+    } catch {
+      isLoggedIn = false;
+    }
+  }
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
+        <Navbar isLoggedIn={isLoggedIn} />
         {children}
         <Footer />
       </body>
