@@ -9,7 +9,7 @@ export default function JobDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [message, setMessage] = useState("");
-  const [role, setRole] = useState("COMPANY");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     async function fetchJob() {
@@ -52,6 +52,7 @@ export default function JobDetailsPage() {
       router.push("/jobs");
     }
   }
+
   if (loading) return <p className="text-center mt-8">Loading...</p>;
   if (!job) return <p className="text-center mt-8">Job not found</p>;
 
@@ -104,12 +105,22 @@ export default function JobDetailsPage() {
           )}
 
           {role === "COMPANY" && (
-            <button
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-6 py-3 rounded-lg"
-            >
-              Delete Job
-            </button>
+            <>
+              <button
+                onClick={() => router.push(`/company/edit-job/${params.id}`)}
+                className="text-white px-6 py-3 rounded-lg"
+                style={{ backgroundColor: "#3b82f6" }}
+              >
+                Edit Job
+              </button>
+              <button
+                onClick={handleDelete}
+                className="text-white px-6 py-3 rounded-lg"
+                style={{ backgroundColor: "#ef4444" }}
+              >
+                Delete Job
+              </button>
+            </>
           )}
         </div>
       </div>

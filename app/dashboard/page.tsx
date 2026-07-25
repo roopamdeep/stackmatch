@@ -45,43 +45,98 @@ export default function DashboardPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-semibold">Applications</h2>
+            <h2 className="text-lg font-semibold">
+              {user?.role === "DEVELOPER"
+                ? "My Applications"
+                : "Applications Received"}
+            </h2>
             <p className="text-gray-600 mt-2">Total: {applications.length}</p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-semibold">Resume</h2>
-            <p className="text-gray-600 mt-2">Upload your latest resume</p>
-            <button className="mt-4 border px-4 py-2 rounded-lg">
-              Upload Resume
-            </button>
+            <h2 className="text-lg font-semibold">
+              {user?.role === "DEVELOPER" ? "Resume" : "Post a Job"}
+            </h2>
+            {user?.role === "DEVELOPER" ? (
+              <>
+                <p className="text-gray-600 mt-2">Upload your latest resume</p>
+                <button className="mt-4 border px-4 py-2 rounded-lg">
+                  Upload Resume
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600 mt-2">Create a new job listing</p>
+                <button
+                  onClick={() => router.push("/company/post-job")}
+                  className="mt-4 border px-4 py-2 rounded-lg"
+                >
+                  Post Job
+                </button>
+              </>
+            )}
           </div>
         </div>
 
         <div className="mt-8 bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold">Recent Applications</h2>
-          {applications.length === 0 ? (
-            <p className="text-gray-600 mt-4">No applications yet</p>
+          {user?.role === "DEVELOPER" ? (
+            <>
+              <h2 className="text-xl font-semibold">Recent Applications</h2>
+              {applications.length === 0 ? (
+                <p className="text-gray-600 mt-4">No applications yet</p>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {applications.map((app: any) => (
+                    <li key={app.id} className="border rounded-lg p-4">
+                      <p className="font-semibold">{app.job?.title}</p>
+                      <p className="text-gray-600 text-sm">
+                        {app.job?.company?.name}
+                      </p>
+                      <p className="text-sm mt-1">
+                        Status:{" "}
+                        <span className="font-medium">{app.status}</span>
+                      </p>
+                      {app.aiScore && (
+                        <p className="text-sm">
+                          AI Score:{" "}
+                          <span className="font-medium">{app.aiScore}/100</span>
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           ) : (
-            <ul className="mt-4 space-y-3">
-              {applications.map((app: any) => (
-                <li key={app.id} className="border rounded-lg p-4">
-                  <p className="font-semibold">{app.job.title}</p>
-                  <p className="text-gray-600 text-sm">
-                    {app.job.company.name}
-                  </p>
-                  <p className="text-sm mt-1">
-                    Status: <span className="font-medium">{app.status}</span>
-                  </p>
-                  {app.aiScore && (
-                    <p className="text-sm">
-                      AI Score:{" "}
-                      <span className="font-medium">{app.aiScore}/100</span>
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <>
+              <h2 className="text-xl font-semibold">Applications Received</h2>
+              {applications.length === 0 ? (
+                <p className="text-gray-600 mt-4">
+                  No applications received yet
+                </p>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {applications.map((app: any) => (
+                    <li key={app.id} className="border rounded-lg p-4">
+                      <p className="font-semibold">{app.developer?.name}</p>
+                      <p className="text-gray-600 text-sm">
+                        Applied for: {app.job?.title}
+                      </p>
+                      <p className="text-sm mt-1">
+                        Skills:{" "}
+                        <span className="font-medium">
+                          {app.developer?.skills?.join(", ")}
+                        </span>
+                      </p>
+                      <p className="text-sm mt-1">
+                        Status:{" "}
+                        <span className="font-medium">{app.status}</span>
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
       </div>

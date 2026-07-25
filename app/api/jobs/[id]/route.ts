@@ -37,6 +37,45 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { verifyToken } = await import("@/lib/auth");
+    const decoded = verifyToken(token) as { userId: string; role: string };
+    if (decoded.role !== "COMPANY") {
+      return NextResponse.json(
+        { error: "Only companies can edit jobs" },
+        { status: 403 },
+      );
+    }
+    const { title, description, location, stack, salary } = await req.json();
+    const job = await prisma.job.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        location,
+        stack,
+        salary,
+      },
+    });
+    return NextResponse.json({ job }, { status: 200 });
+  } catch (error) {
+    console.error("Update job error:", error);
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
