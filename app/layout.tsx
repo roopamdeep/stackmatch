@@ -28,10 +28,12 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   let isLoggedIn = false;
+  let role = "";
   if (token) {
     try {
-      verifyToken(token);
+      const decoded = verifyToken(token) as { userId: string; role: string };
       isLoggedIn = true;
+      role = decoded.role;
     } catch {
       isLoggedIn = false;
     }
@@ -41,7 +43,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar isLoggedIn={isLoggedIn} />
+        <Navbar isLoggedIn={isLoggedIn} role={role} />
         {children}
         <Footer />
       </body>

@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function Navbar({
+  isLoggedIn,
+  role,
+}: {
+  isLoggedIn: boolean;
+  role: string;
+}) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -18,7 +24,7 @@ export default function Navbar({ isLoggedIn }: { isLoggedIn: boolean }) {
       {isLoggedIn ? (
         <>
           <Link href="/dashboard">Dashboard</Link>
-          <Link href="/company/post-job">Post Job</Link>
+          {role === "COMPANY" && <Link href="/company/post-job">Post Job</Link>}
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
