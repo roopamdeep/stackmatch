@@ -38,6 +38,9 @@ export default function PostJobPage() {
 
     if (res.ok) {
       setSuccess("Job posted successfully! ✅");
+      setTimeout(() => {
+        router.push("/jobs");
+      }, 1500);
     } else {
       const data = await res.json();
       setError(data.error);

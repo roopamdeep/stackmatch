@@ -1,13 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function JobDetailsPage() {
   const params = useParams();
+  const router = useRouter();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [message, setMessage] = useState("");
+  const [role, setRole] = useState("COMPANY");
 
   useEffect(() => {
     async function fetchJob() {
@@ -17,6 +19,12 @@ export default function JobDetailsPage() {
       setLoading(false);
     }
     fetchJob();
+
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) setRole(data.user.role);
+      });
   }, [params.id]);
 
   async function handleApply() {
@@ -36,6 +44,14 @@ export default function JobDetailsPage() {
     setApplying(false);
   }
 
+  async function handleDelete() {
+    const res = await fetch(`/api/jobs/${params.id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      router.push("/jobs");
+    }
+  }
   if (loading) return <p className="text-center mt-8">Loading...</p>;
   if (!job) return <p className="text-center mt-8">Job not found</p>;
 
@@ -76,13 +92,26 @@ export default function JobDetailsPage() {
           <p className="mt-4 text-center text-green-600">{message}</p>
         )}
 
-        <button
-          onClick={handleApply}
-          disabled={applying}
-          className="mt-8 bg-black text-white px-6 py-3 rounded-lg disabled:opacity-50"
-        >
-          {applying ? "Applying..." : "Apply Now"}
-        </button>
+        <div className="flex gap-4 mt-8">
+          {role === "DEVELOPER" && (
+            <button
+              onClick={handleApply}
+              disabled={applying}
+              className="bg-black text-white px-6 py-3 rounded-lg disabled:opacity-50"
+            >
+              {applying ? "Applying..." : "Apply Now"}
+            </button>
+          )}
+
+          {role === "COMPANY" && (
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-6 py-3 rounded-lg"
+            >
+              Delete Job
+            </button>
+          )}
+        </div>
       </div>
     </main>
   );

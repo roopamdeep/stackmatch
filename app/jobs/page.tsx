@@ -8,6 +8,7 @@ export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [stack, setStack] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     async function fetchJobs() {
@@ -17,6 +18,11 @@ export default function JobsPage() {
       setLoading(false);
     }
     fetchJobs();
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) setRole(data.user.role);
+      });
   }, []);
 
   const filtered = jobs.filter((job: any) => {
@@ -69,7 +75,9 @@ export default function JobsPage() {
             {filtered.length === 0 ? (
               <p className="text-center text-gray-600">No jobs found</p>
             ) : (
-              filtered.map((job: any) => <JobCard key={job.id} job={job} />)
+              filtered.map((job: any) => (
+                <JobCard key={job.id} job={job} role={role} />
+              ))
             )}
           </div>
         )}
