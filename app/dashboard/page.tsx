@@ -29,6 +29,25 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
+  async function handleResumeUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("resume", file);
+    const res = await fetch("/api/upload/resume", {
+      method: "POST",
+      body: formData,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setUser({ ...user, developer: { resumeUrl: data.resumeUrl } });
+      alert("Resume uploaded successfully!");
+    } else {
+      const data = await res.json();
+      alert(data.error);
+    }
+  }
+
   if (loading) return <p className="text-center mt-8">Loading...</p>;
 
   return (
@@ -54,50 +73,45 @@ export default function DashboardPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-semibold">
-              {user?.role === "DEVELOPER" ? "Resume" : "Post a Job"}
-            </h2>
             {user?.role === "DEVELOPER" ? (
-              <>
-                <div className="bg-white p-6 rounded-2xl shadow-sm">
-                  <h2 className="text-lg font-semibold">Resume</h2>
-                  <p className="text-gray-600 mt-2">
-                    Upload your latest resume (PDF only, max 5MB)
-                  </p>
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    id="resume-upload"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const formData = new FormData();
-                      formData.append("resume", file);
-                      const res = await fetch("/api/upload/resume", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      if (res.ok) {
-                        alert("Resume uploaded successfully! ✅");
-                      } else {
-                        const data = await res.json();
-                        alert(data.error);
-                      }
-                    }}
-                  />
-                  <button
-                    className="mt-4 border px-4 py-2 rounded-lg"
-                    onClick={() =>
-                      document.getElementById("resume-upload")?.click()
-                    }
+              <div>
+                <h2 className="text-lg font-semibold">Resume</h2>
+                <p className="text-gray-600 mt-2">
+                  {user?.developer?.resumeUrl
+                    ? "Resume uploaded ✅"
+                    : "No resume uploaded yet"}
+                </p>
+                {user?.developer?.resumeUrl && (
+                  <a
+                    href={user.developer.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 text-sm mt-1 block"
                   >
-                    Upload Resume
-                  </button>
-                </div>
-              </>
+                    View Resume
+                  </a>
+                )}
+                <input
+                  type="file"
+                  accept=".pdf"
+                  id="resume-upload"
+                  className="hidden"
+                  onChange={handleResumeUpload}
+                />
+                <button
+                  className="mt-4 border px-4 py-2 rounded-lg"
+                  onClick={() =>
+                    document.getElementById("resume-upload")?.click()
+                  }
+                >
+                  {user?.developer?.resumeUrl
+                    ? "Update Resume"
+                    : "Upload Resume"}
+                </button>
+              </div>
             ) : (
-              <>
+              <div>
+                <h2 className="text-lg font-semibold">Post a Job</h2>
                 <p className="text-gray-600 mt-2">Create a new job listing</p>
                 <button
                   onClick={() => router.push("/company/post-job")}
@@ -105,14 +119,14 @@ export default function DashboardPage() {
                 >
                   Post Job
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>
 
         <div className="mt-8 bg-white rounded-2xl shadow-sm p-6">
           {user?.role === "DEVELOPER" ? (
-            <>
+            <div>
               <h2 className="text-xl font-semibold">Recent Applications</h2>
               {applications.length === 0 ? (
                 <p className="text-gray-600 mt-4">No applications yet</p>
@@ -138,9 +152,9 @@ export default function DashboardPage() {
                   ))}
                 </ul>
               )}
-            </>
+            </div>
           ) : (
-            <>
+            <div>
               <h2 className="text-xl font-semibold">Applications Received</h2>
               {applications.length === 0 ? (
                 <p className="text-gray-600 mt-4">
@@ -164,11 +178,21 @@ export default function DashboardPage() {
                         Status:{" "}
                         <span className="font-medium">{app.status}</span>
                       </p>
+                      {app.developer?.resumeUrl && (
+                        <a
+                          href={app.developer.resumeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 text-sm mt-1 block"
+                        >
+                          View Resume
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
