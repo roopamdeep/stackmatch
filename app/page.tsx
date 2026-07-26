@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
@@ -9,11 +11,15 @@ export default function Home() {
         </p>
 
         <div className="mt-8 flex gap-4">
-          <button className="bg-black text-white px-6 py-3 rounded-lg">
-            Find Jobs
-          </button>
+          <Link href="/jobs">
+            <button className="bg-black text-white px-6 py-3 rounded-lg">
+              Find Jobs
+            </button>
+          </Link>
 
-          <button className="border px-6 py-3 rounded-lg">Post Jobs</button>
+          <Link href="/company/post-job">
+            <button className="border px-6 py-3 rounded-lg">Post Jobs</button>
+          </Link>
         </div>
       </section>
 

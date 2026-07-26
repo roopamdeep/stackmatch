@@ -59,10 +59,42 @@ export default function DashboardPage() {
             </h2>
             {user?.role === "DEVELOPER" ? (
               <>
-                <p className="text-gray-600 mt-2">Upload your latest resume</p>
-                <button className="mt-4 border px-4 py-2 rounded-lg">
-                  Upload Resume
-                </button>
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
+                  <h2 className="text-lg font-semibold">Resume</h2>
+                  <p className="text-gray-600 mt-2">
+                    Upload your latest resume (PDF only, max 5MB)
+                  </p>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    id="resume-upload"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const formData = new FormData();
+                      formData.append("resume", file);
+                      const res = await fetch("/api/upload/resume", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      if (res.ok) {
+                        alert("Resume uploaded successfully! ✅");
+                      } else {
+                        const data = await res.json();
+                        alert(data.error);
+                      }
+                    }}
+                  />
+                  <button
+                    className="mt-4 border px-4 py-2 rounded-lg"
+                    onClick={() =>
+                      document.getElementById("resume-upload")?.click()
+                    }
+                  >
+                    Upload Resume
+                  </button>
+                </div>
               </>
             ) : (
               <>
