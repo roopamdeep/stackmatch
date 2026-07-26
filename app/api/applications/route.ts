@@ -139,3 +139,30 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+export async function PATCH(req: NextRequest) {
+  try {
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const decoded = verifyToken(token) as { userId: string; role: string };
+    if (decoded.role !== "COMPANY") {
+      return NextResponse.json(
+        { error: "Only companies can update status" },
+        { status: 403 },
+      );
+    }
+    const { applicationId, status } = await req.json();
+    const application = await prisma.application.update({
+      where: { id: applicationId },
+      data: { status },
+    });
+    return NextResponse.json({ application }, { status: 200 });
+  } catch (error) {
+    console.error("Update status error:", error);
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}

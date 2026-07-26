@@ -188,6 +188,65 @@ export default function DashboardPage() {
                           View Resume
                         </a>
                       )}
+                      <div className="flex gap-2 mt-3">
+                        {app.status !== "SHORTLISTED" && (
+                          <button
+                            onClick={async () => {
+                              await fetch("/api/applications", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  applicationId: app.id,
+                                  status: "SHORTLISTED",
+                                }),
+                              });
+                              window.location.reload();
+                            }}
+                            className="text-white text-sm px-3 py-1 rounded"
+                            style={{ backgroundColor: "#3b82f6" }}
+                          >
+                            Shortlist
+                          </button>
+                        )}
+                        {app.status !== "INTERVIEW" && (
+                          <button
+                            onClick={async () => {
+                              await fetch("/api/applications", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  applicationId: app.id,
+                                  status: "INTERVIEW",
+                                }),
+                              });
+                              window.location.reload();
+                            }}
+                            className="text-white text-sm px-3 py-1 rounded"
+                            style={{ backgroundColor: "#10b981" }}
+                          >
+                            Interview
+                          </button>
+                        )}
+                        {app.status !== "REJECTED" && (
+                          <button
+                            onClick={async () => {
+                              await fetch("/api/applications", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  applicationId: app.id,
+                                  status: "REJECTED",
+                                }),
+                              });
+                              window.location.reload();
+                            }}
+                            className="text-white text-sm px-3 py-1 rounded"
+                            style={{ backgroundColor: "#ef4444" }}
+                          >
+                            Reject
+                          </button>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>

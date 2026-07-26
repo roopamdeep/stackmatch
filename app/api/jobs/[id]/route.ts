@@ -94,6 +94,7 @@ export async function DELETE(
         { status: 403 },
       );
     }
+    await prisma.application.deleteMany({ where: { jobId: id } });
     await prisma.job.delete({ where: { id } });
     return NextResponse.json(
       { message: "Job deleted successfully" },
