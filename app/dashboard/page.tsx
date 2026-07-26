@@ -86,7 +86,8 @@ export default function DashboardPage() {
                     href={user.developer.resumeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 text-sm mt-1 block"
+                    className="text-white text-sm px-3 py-1 rounded mt-2 inline-block"
+                    style={{ backgroundColor: "#0ea5e9" }}
                   >
                     View Resume
                   </a>
@@ -142,11 +143,31 @@ export default function DashboardPage() {
                         Status:{" "}
                         <span className="font-medium">{app.status}</span>
                       </p>
-                      {app.aiScore && (
-                        <p className="text-sm">
+                      {app.aiScore ? (
+                        <p className="text-sm mt-1">
                           AI Score:{" "}
                           <span className="font-medium">{app.aiScore}/100</span>
                         </p>
+                      ) : (
+                        <button
+                          onClick={async () => {
+                            const res = await fetch("/api/ai/score", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ applicationId: app.id }),
+                            });
+                            if (res.ok) {
+                              window.location.reload();
+                            } else {
+                              const data = await res.json();
+                              alert(data.error);
+                            }
+                          }}
+                          className="text-white text-sm px-3 py-1 rounded mt-2"
+                          style={{ backgroundColor: "#8b5cf6" }}
+                        >
+                          Get AI Score
+                        </button>
                       )}
                     </li>
                   ))}
@@ -178,12 +199,14 @@ export default function DashboardPage() {
                         Status:{" "}
                         <span className="font-medium">{app.status}</span>
                       </p>
+
                       {app.developer?.resumeUrl && (
                         <a
                           href={app.developer.resumeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 text-sm mt-1 block"
+                          className="text-white text-sm px-3 py-1 rounded mt-2 inline-block"
+                          style={{ backgroundColor: "#0ea5e9" }}
                         >
                           View Resume
                         </a>
