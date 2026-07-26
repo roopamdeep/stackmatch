@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
+import { sendApplicationEmail, sendStatusUpdateEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
 
     const developer = await prisma.developer.findUnique({
       where: { userId: decoded.userId },
+      include: { user: { select: { email: true } } },
     });
 
     if (!developer) {
@@ -47,6 +49,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const job = await prisma.job.findUnique({
+      where: { id: jobId },
+      include: { company: { select: { name: true } } },
+    });
+
     const application = await prisma.application.create({
       data: {
         jobId,
@@ -54,6 +61,20 @@ export async function POST(req: NextRequest) {
         status: "PENDING",
       },
     });
+
+    // send confirmation email to developer
+    if (job && developer.user?.email) {
+      try {
+        await sendApplicationEmail(
+          developer.user.email,
+          developer.name,
+          job.title,
+          job.company.name,
+        );
+      } catch (emailError) {
+        console.error("Email error:", emailError);
+      }
+    }
 
     return NextResponse.json({ application }, { status: 201 });
   } catch (error) {
@@ -139,6 +160,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 export async function PATCH(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
@@ -153,10 +175,32 @@ export async function PATCH(req: NextRequest) {
       );
     }
     const { applicationId, status } = await req.json();
+
     const application = await prisma.application.update({
       where: { id: applicationId },
       data: { status },
+      include: {
+        developer: {
+          include: { user: { select: { email: true } } },
+        },
+        job: { select: { title: true } },
+      },
     });
+
+    // send status update email to developer
+    if (application.developer.user?.email) {
+      try {
+        await sendStatusUpdateEmail(
+          application.developer.user.email,
+          application.developer.name,
+          application.job.title,
+          status,
+        );
+      } catch (emailError) {
+        console.error("Email error:", emailError);
+      }
+    }
+
     return NextResponse.json({ application }, { status: 200 });
   } catch (error) {
     console.error("Update status error:", error);
